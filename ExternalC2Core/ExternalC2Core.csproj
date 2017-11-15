@@ -29,8 +29,4 @@
     <Folder Include="Frames\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="NetMQ" Version="4.0.0.1" />
-  </ItemGroup>
-
 </Project>

@@ -43,7 +43,7 @@ namespace ExternalC2Web.Controllers
 
             // TODO: Implement more robust request/response configuration
             HttpContext.Response.Headers.Add("X-Id-Header", IdHeader);
-            HttpContext.Response.Headers.Add("X-Identifier", beaconId.ToString());
+            HttpContext.Response.Headers.Add("X-Identifier", beaconId.InternalId.ToString());
         }
 
         /// <summary>
