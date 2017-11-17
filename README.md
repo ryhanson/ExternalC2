@@ -1,7 +1,7 @@
 # ExternalC2
 > A library for integrating communication channels with the Cobalt Strike External C2 server
 
-This library provides an implementation of the [Cobalt Strike External C2 spec](https://www.cobaltstrike.com/downloads/externalc2spec.pdf), 
+This library provides an implementation of the [Cobalt Strike External C2 spec](https://www.cobaltstrike.com/help-externalc2), 
 including a basic web channel and a websocket channel. The codebase has been documented and designed to allow additional channels to be
 added easily.
 
