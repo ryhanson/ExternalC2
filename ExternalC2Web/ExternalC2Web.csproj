@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <RepositoryUrl>https://github.com/ryhanson/ExternalC2</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

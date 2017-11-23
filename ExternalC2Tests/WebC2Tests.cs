@@ -9,7 +9,7 @@ namespace ExternalC2Tests
     [TestClass]
     public class WebC2Tests
     {
-        private readonly string _url = "http://127.0.0.1/beacon"; // Set to ExternalC2Web dotnet server
+        private readonly string _url = "http://127.0.0.1:50676/beacon"; // Set to ExternalC2Web dotnet server
         private WebC2 _beacon = new WebC2();
 
         [TestInitialize]
